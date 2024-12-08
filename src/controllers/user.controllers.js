@@ -1,6 +1,21 @@
 import mongoose from "mongoose";
 import users from "../models/user.models.js"
 import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
+
+const generateRefreshToken = (user) => {
+    return jwt.sign({ email: user.email }, process.env.ACCESS_JWT_SECRET, {
+        expiresIn: '1h'
+    })
+}
+
+const generateAccessToken = (user) => {
+    return jwt.sign({ email: user.email }, process.env.ACCESS_JWT_SECRET, {
+        expiresIn: '1h'
+    })
+}
+
+
 
 const signInUser = async (req, res) => {
     const { email, password } = req.body;
@@ -25,7 +40,13 @@ const loginUser = async (req, res) => {
         if (!user) return res.status(400).json({ message: "No user found" })
         const checkPassword = await bcrypt.compare(password, user.password)
         if (!checkPassword) return res.status(400).json({ message: "Incorrect password" })
-        res.json({ message: "Login" })
+
+        // generate Token from user 
+        const accessToken = generateAccessToken(user)
+        const refreshToken = generateRefreshToken(user)
+
+        res.cookie("refreshToken", refreshToken, { http: true, secure: false });
+        res.json({ refreshToken, accessToken, message: "Login", data: user })
     } catch (error) {
         res.json({ message: "error" })
     }

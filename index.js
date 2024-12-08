@@ -6,8 +6,10 @@ const port = process.env.PORT
 
 import connectdb from "./src/db/index.js"
 import router from "./src/routes/user.route.js"
+import cookieParser from "cookie-parser"
 
 app.use(express.json())
+app.use(cookieParser())
 
 app.get('/', (req, res) => {
     res.send('Talha')
