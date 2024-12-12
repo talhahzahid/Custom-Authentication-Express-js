@@ -37,7 +37,7 @@
 
 import jwt from 'jsonwebtoken';
 const checkUser = (req, res) => {
-  const token = req.cookies.refreshToken || req.headers['authorization']?.split(' ')[1];
+  const token = req.cookies.refreshToken;
 
   if (!token) {
     return res.status(403).json({ message: "No token provided" });
@@ -50,6 +50,7 @@ const checkUser = (req, res) => {
     res.json({
       message: "User authenticated",
       user: req.user,
+      token
     });
   });
 };
